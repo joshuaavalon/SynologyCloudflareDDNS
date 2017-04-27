@@ -1,4 +1,4 @@
-# Synology Cloudflare DDNS Script 📜
+# Synology Cloudflare DDNS Script 
 The is a script to be used to add [Cloudflare](https://www.cloudflare.com/) as a DDNS to [Synology](https://www.synology.com/) NAS. This is a modified version [script](https://gist.github.com/tehmantra/f1d2579f3c922e8bb4a0) from [Michael Wildman](https://gist.github.com/tehmantra). The script used an updated API, Cloudflare API v4.
 
 ## How to use
@@ -49,25 +49,25 @@ You need to replace with [] with your parameter. Then, you get the `id` in `resu
 4. Select Cloudflare as service provider. Enter your domain as hostname, your Cloudflare account as Username/Email, and API key as Password/Key
 
 ## Parameters
-### __USERNAME__, __PASSWORD__, __HOSTNAME__, __MYIP__
+### \_\_USERNAME\_\_, \_\_PASSWORD\_\_, \_\_HOSTNAME\_\_, \_\_MYIP\_\_
 These are the parameters from Synology.
 
-### __RECTYPE__
+### \_\_RECTYPE\_\_
 DNS record type
 
-### __RECID__
+### \_\_RECID\_\_
 Record ID
 
-### __ZONE_ID__
+### \_\_ZONE\_ID\_\_
 Zone ID
 
-### __TTL__
+### \_\_TTL\_\_
 Time to live for DNS record. Value of 1 is 'automatic'
 
-### __PROXY__
+### \_\_PROXY\_\_
 Whether the record is receiving the performance and security benefits of Cloudflare.
 
-### __LOGFILE__
+### \_\_LOGFILE\_\_
 Log file location
 
 You can read the [Cloudflare API documentation v4](https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record) for more details.
