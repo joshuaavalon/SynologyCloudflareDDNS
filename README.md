@@ -25,8 +25,8 @@ chmod +x /sbin/cloudflaredns.sh
 cat >> /etc.defaults/ddns_provider.conf << 'EOF'
 [Cloudflare]
         modulepath=/sbin/cloudflaredns.sh
-        queryurl=https://www.cloudflare.com/
-EOF
+        queryurl=https://www.cloudflare.com/
+E*.
 ```
 `queryurl` does not matter because we are going to use our script but it is needed.
 
@@ -40,7 +40,7 @@ curl -X GET "https://api.cloudflare.com/client/v4/zones/[Zone ID]" \
      -H "X-Auth-Key: [API Key]" \
      -H "Content-Type: application/json"
 ```
-You need to replace with [] with your parameter. Then, you get the `id` in `result` which is you record id.
+You need to replace with [] with your parameter. Then, you get the `id` in `result` which is you **Record ID**.
 
 ### Setup DDNS
 1. Enter the parameters to the `cloudflareddns.sh`.
