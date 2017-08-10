@@ -35,7 +35,7 @@ E*.
 2. Go to your [account setting page](https://www.cloudflare.com/a/account/my-account) and get **API Key**.
 3. Get record id using Cloudflare API.
 ```
-curl -X GET "https://api.cloudflare.com/client/v4/zones/[Zone ID]" \
+curl -X GET "https://api.cloudflare.com/client/v4/zones/[Zone ID]/dns_records" \
      -H "X-Auth-Email: [Email]" \
      -H "X-Auth-Key: [API Key]" \
      -H "Content-Type: application/json"
