@@ -1,62 +1,54 @@
-#!/bin/sh
+#!/bin/bash
+set -e;
+
+ipv4Regex="((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])"
+
+proxy="true"
 
 # DSM Config
-__USERNAME__="$(echo ${@} | cut -d' ' -f1)"
-__PASSWORD__="$(echo ${@} | cut -d' ' -f2)"
-__HOSTNAME__="$(echo ${@} | cut -d' ' -f3)"
-__MYIP__="$(echo ${@}  | cut -d' ' -f4)"
+username="$1"
+password="$2"
+hostname="$3"
+ipAddr="$4"
 
-# log location
-__LOGFILE__="/var/log/cloudflareddns.log"
+if [[ $ipAddr =~ $ipv4Regex ]]; then
+    recordType="A";
+else
+    recordType="AAAA";
+fi
 
-# CloudFlare Config
-__RECTYPE__="A"
-__RECID__=""
-__ZONE_ID__=""
-__TTL__="1"
-__PROXY__="true"
+listDnsApi="https://api.cloudflare.com/client/v4/zones/${username}/dns_records?type=${recordType}&name=${hostname}"
+createDnsApi="https://api.cloudflare.com/client/v4/zones/${username}/dns_records"
 
-log() {
-    __LOGTIME__=$(date +"%b %e %T")
-    if [ "${#}" -lt 1 ]; then
-        false
-    else
-        __LOGMSG__="${1}"
-    fi
-    if [ "${#}" -lt 2 ]; then
-        __LOGPRIO__=7
-    else
-        __LOGPRIO__=${2}
-    fi
+res=$(curl -s -X GET "$listDnsApi" -H "Authorization: Bearer $password" -H "Content-Type:application/json")
+resSuccess=$(echo "$res" | jq -r ".success")
 
-    logger -p ${__LOGPRIO__} -t "$(basename ${0})" "${__LOGMSG__}"
-    echo "${__LOGTIME__} $(basename ${0}) (${__LOGPRIO__}): ${__LOGMSG__}" >> ${__LOGFILE__}
-}
+if [[ $resSuccess != "true" ]]; then
+    echo "badauth";
+    exit 1;
+fi
 
-__URL__="https://api.cloudflare.com/client/v4/zones/${__ZONE_ID__}/dns_records/${__RECID__}"
+recordId=$(echo "$res" | jq -r ".result[0].id")
+recordIp=$(echo "$res" | jq -r ".result[0].content")
 
-# Update DNS record:
-log "Updating with ${__MYIP__}..."
-__RESPONSE__=$(curl -s -X PUT "${__URL__}" \
-     -H "X-Auth-Email: ${__USERNAME__}" \
-     -H "X-Auth-Key: ${__PASSWORD__}" \
-     -H "Content-Type: application/json" \
-     --data "{\"type\":\"${__RECTYPE__}\",\"name\":\"${__HOSTNAME__}\",\"content\":\"${__MYIP__}\",\"ttl\":${__TTL__},\"proxied\":${__PROXY__}}")
+if [[ $recordIp = "$ipAddr" ]]; then
+    echo "nochg";
+    exit 0;
+fi
 
-# Strip the result element from response json
-__RESULT__=$(echo ${__RESPONSE__} | grep -Po '"success":\K.*?[^\\],')
-echo ${__RESPONSE__}
-case ${__RESULT__} in
-    'true,')
-        __STATUS__='good'
-        true
-        ;;
-    *)
-        __STATUS__="${__RESULT__}"
-        log "__RESPONSE__=${__RESPONSE__}"
-        false
-        ;;
-esac
-log "Status: ${__STATUS__}"
+if [[ $recordId = "null" ]]; then
+    # Record not exists
+    res=$(curl -s -X POST "$createDnsApi" -H "Authorization: Bearer $password" -H "Content-Type:application/json" --data "{\"type\":\"$recordType\",\"name\":\"$hostname\",\"content\":\"$ipAddr\",\"proxied\":$proxy}")
+else
+    # Record exists
+    updateDnsApi="https://api.cloudflare.com/client/v4/zones/${username}/dns_records/${recordId}";
+    res=$(curl -s -X PUT "$updateDnsApi" -H "Authorization: Bearer $password" -H "Content-Type:application/json" --data "{\"type\":\"$recordType\",\"name\":\"$hostname\",\"content\":\"$ipAddr\",\"proxied\":$proxy}")
+fi
 
-printf "%s" "${__STATUS__}"
+resSuccess=$(echo "$res" | jq -r ".success")
+
+if [[ $resSuccess = "true" ]]; then
+    echo "good";
+else
+    echo "badauth";
+fi
