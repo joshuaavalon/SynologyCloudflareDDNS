@@ -13,10 +13,10 @@ The is a script to be used to add [Cloudflare](https://www.cloudflare.com/) as a
 
 ### Run commands in Synology
 
-1. Download `cloudflareddns.sh` from this repository to `/sbin/cloudflaredns.sh`
+1. Download `cloudflareddns.sh` from this repository to `/sbin/cloudflareddns.sh`
 
 ```
-wget https://raw.githubusercontent.com/joshuaavalon/SynologyCloudflareDDNS/master/cloudflareddns.sh -O /sbin/cloudflaredns.sh
+wget https://raw.githubusercontent.com/joshuaavalon/SynologyCloudflareDDNS/master/cloudflareddns.sh -O /sbin/cloudflareddns.sh
 ```
 
 It is not a must, you can put I whatever you want. If you put the script in other name or path, make sure you use the right path.
@@ -24,7 +24,7 @@ It is not a must, you can put I whatever you want. If you put the script in othe
 2. Give others execute permission
 
 ```
-chmod +x /sbin/cloudflaredns.sh
+chmod +x /sbin/cloudflareddns.sh
 ```
 
 3. Add `cloudflareddns.sh` to Synology
