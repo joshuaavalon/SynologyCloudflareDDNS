@@ -35,7 +35,7 @@ cat >> /etc.defaults/ddns_provider.conf << 'EOF'
         modulepath=/sbin/cloudflareddns.sh
         queryurl=https://www.cloudflare.com
         website=https://www.cloudflare.com
-E*.
+EOF
 ```
 
 `queryurl` does not matter because we are going to use our script but it is needed.
