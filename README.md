@@ -47,10 +47,12 @@ E*.
 
 ### Setup DDNS
 
+Hostname can contain one entry or several entries separated by `--`.
+
 1. Login to your DSM
 2. Go to Control Panel > External Access > DDNS > Add
 3. Enter the following:
    - Service provider: `Cloudflare`
-   - Hostname: `www.example.com`
+   - Hostname: `www.example.com--files.example.com--example.com`
    - Username/Email: `<Zone ID>`
    - Password Key: `<API Token>`

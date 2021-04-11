@@ -8,47 +8,58 @@ proxy="true"
 # DSM Config
 username="$1"
 password="$2"
-hostname="$3"
+hostnames="$3"
 ipAddr="$4"
 
 if [[ $ipAddr =~ $ipv4Regex ]]; then
-    recordType="A";
+    recordType="A"
 else
-    recordType="AAAA";
+    recordType="AAAA"
 fi
 
-listDnsApi="https://api.cloudflare.com/client/v4/zones/${username}/dns_records?type=${recordType}&name=${hostname}"
-createDnsApi="https://api.cloudflare.com/client/v4/zones/${username}/dns_records"
+no_change=true
+hostnames_array=(${hostnames//--/ })
 
-res=$(curl -s -X GET "$listDnsApi" -H "Authorization: Bearer $password" -H "Content-Type:application/json")
-resSuccess=$(echo "$res" | jq -r ".success")
+for hostname in "${hostnames_array[@]}"; do
+    listDnsApi="https://api.cloudflare.com/client/v4/zones/${username}/dns_records?type=${recordType}&name=${hostname}"
+    createDnsApi="https://api.cloudflare.com/client/v4/zones/${username}/dns_records"
 
-if [[ $resSuccess != "true" ]]; then
-    echo "badauth";
-    exit 1;
-fi
+    res=$(curl -s -X GET "$listDnsApi" -H "Authorization: Bearer $password" -H "Content-Type:application/json")
+    resSuccess=$(echo "$res" | jq -r ".success")
 
-recordId=$(echo "$res" | jq -r ".result[0].id")
-recordIp=$(echo "$res" | jq -r ".result[0].content")
+    if [[ $resSuccess != "true" ]]; then
+        echo "badauth"
+        exit 1
+    fi
 
-if [[ $recordIp = "$ipAddr" ]]; then
+    recordId=$(echo "$res" | jq -r ".result[0].id")
+    recordIp=$(echo "$res" | jq -r ".result[0].content")
+
+    if [[ $recordIp == $ipAddr ]]; then
+        continue
+    fi
+
+    no_change=false
+
+    if [[ $recordId == "null" ]]; then
+        # Record not exists
+        res=$(curl -s -X POST "$createDnsApi" -H "Authorization: Bearer $password" -H "Content-Type:application/json" --data "{\"type\":\"$recordType\",\"name\":\"$hostname\",\"content\":\"$ipAddr\",\"proxied\":$proxy}")
+    else
+        # Record exists
+        updateDnsApi="https://api.cloudflare.com/client/v4/zones/${username}/dns_records/${recordId}"
+        res=$(curl -s -X PUT "$updateDnsApi" -H "Authorization: Bearer $password" -H "Content-Type:application/json" --data "{\"type\":\"$recordType\",\"name\":\"$hostname\",\"content\":\"$ipAddr\",\"proxied\":$proxy}")
+    fi
+
+    resSuccess=$(echo "$res" | jq -r ".success")
+
+    if [[ $resSuccess != "true" ]]; then
+        echo "badauth"
+        exit 1
+    fi
+done
+
+if [[ $no_change == true ]]; then
     echo "nochg";
-    exit 0;
-fi
-
-if [[ $recordId = "null" ]]; then
-    # Record not exists
-    res=$(curl -s -X POST "$createDnsApi" -H "Authorization: Bearer $password" -H "Content-Type:application/json" --data "{\"type\":\"$recordType\",\"name\":\"$hostname\",\"content\":\"$ipAddr\",\"proxied\":$proxy}")
 else
-    # Record exists
-    updateDnsApi="https://api.cloudflare.com/client/v4/zones/${username}/dns_records/${recordId}";
-    res=$(curl -s -X PUT "$updateDnsApi" -H "Authorization: Bearer $password" -H "Content-Type:application/json" --data "{\"type\":\"$recordType\",\"name\":\"$hostname\",\"content\":\"$ipAddr\",\"proxied\":$proxy}")
-fi
-
-resSuccess=$(echo "$res" | jq -r ".success")
-
-if [[ $resSuccess = "true" ]]; then
     echo "good";
-else
-    echo "badauth";
 fi
