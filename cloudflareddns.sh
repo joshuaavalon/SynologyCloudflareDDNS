@@ -85,7 +85,7 @@ if [[ $ipv6 = "true" ]] ; then
     # IPv6 Record exists
     res6=$(curl -s -X PUT "$update6DnsApi" -H "Authorization: Bearer $password" -H "Content-Type:application/json" --data "{\"type\":\"$recType6\",\"name\":\"$hostname\",\"content\":\"$ip6Addr\",\"proxied\":$recordProxv6}");
 	fi;
-	res6Success=$(echo "$res6" | jq -r ".success")
+	res6Success=$(echo "$res6" | jq -r ".success");
 fi
 resSuccess=$(echo "$res" | jq -r ".success")
 
