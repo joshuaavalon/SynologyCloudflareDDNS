@@ -16,7 +16,7 @@ The is a script to be used to add [Cloudflare](https://www.cloudflare.com/) as a
 1. Download `cloudflareddns.sh` from this repository to `/sbin/cloudflareddns.sh`
 
 ```
-wget https://raw.githubusercontent.com/joshuaavalon/SynologyCloudflareDDNS/master/cloudflareddns.sh -O /sbin/cloudflareddns.sh
+wget https://raw.githubusercontent.com/Marcio2536/SynologyCloudflareDDNS/master/cloudflareddns.sh -O /sbin/cloudflareddns.sh
 ```
 
 It is not a must, you can put I whatever you want. If you put the script in other name or path, make sure you use the right path.
