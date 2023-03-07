@@ -3,7 +3,7 @@ set -e;
 
 ipv4Regex="((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])"
 
-proxy="true"
+#proxy="true"
 
 # DSM Config
 username="$1"
@@ -30,6 +30,9 @@ fi
 
 recordId=$(echo "$res" | jq -r ".result[0].id")
 recordIp=$(echo "$res" | jq -r ".result[0].content")
+#获取域名记录初始代理状态，如域名记录不存在，在新增域名记录时，默认打开代理。
+proxy=$(echo "$res" | jq -r ".result[0].proxied")
+if [[ "$proxy" == "null" ]]; then proxy='true'; fi
 
 if [[ $recordIp = "$ipAddr" ]]; then
     echo "nochg";
