@@ -16,7 +16,7 @@ The is a script to be used to add [Cloudflare](https://www.cloudflare.com/) as a
 1. Download `cloudflareddns.sh` from this repository to `/sbin/cloudflareddns.sh`
 
 ```
-wget https://raw.githubusercontent.com/joshuaavalon/SynologyCloudflareDDNS/master/cloudflareddns.sh -O /sbin/cloudflareddns.sh
+wget https://raw.githubusercontent.com/joshuaavalon/SynologyCloudflareDDNS/master/cloudflareddns.sh -O /usr/syno/bin/ddns/cloudflareddns.sh
 ```
 
 It is not a must, you can put I whatever you want. If you put the script in other name or path, make sure you use the right path.
@@ -24,7 +24,7 @@ It is not a must, you can put I whatever you want. If you put the script in othe
 2. Give others execute permission
 
 ```
-chmod +x /sbin/cloudflareddns.sh
+chmod 755 /usr/syno/bin/ddns/cloudflareddns.sh
 ```
 
 3. Add `cloudflareddns.sh` to Synology
@@ -32,7 +32,7 @@ chmod +x /sbin/cloudflareddns.sh
 ```
 cat >> /etc.defaults/ddns_provider.conf << 'EOF'
 [Cloudflare]
-        modulepath=/sbin/cloudflareddns.sh
+        modulepath=/usr/syno/bin/ddns/cloudflareddns.sh
         queryurl=https://www.cloudflare.com
         website=https://www.cloudflare.com
 E*.
